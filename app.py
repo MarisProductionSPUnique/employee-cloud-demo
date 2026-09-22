@@ -24,6 +24,8 @@ from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from werkzeug.exceptions import HTTPException
 
+from splunk_hec import configure_splunk_logging
+
 
 load_dotenv()
 
@@ -229,6 +231,7 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
 
     db.init_app(app)
     app.logger.setLevel(logging.INFO)
+    configure_splunk_logging(app.logger)
 
     with app.app_context():
         try:
