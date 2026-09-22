@@ -17,3 +17,15 @@ services:
         value: "true"
       - key: DEMO_MODE
         value: "true"
+      - key: SPLUNK_HEC_URL
+        sync: false
+      - key: SPLUNK_HEC_TOKEN
+        sync: false
+      - key: SPLUNK_INDEX
+        value: "employee_app"
+      - key: SPLUNK_SOURCE
+        value: "employee-cloud-demo"
+      - key: SPLUNK_SOURCETYPE
+        value: "_json"
+      - key: SPLUNK_VERIFY_SSL
+        value: "true"
