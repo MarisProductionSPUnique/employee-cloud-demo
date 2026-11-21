@@ -215,10 +215,19 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
     configured_url = _normalise_database_url(
         os.getenv("DATABASE_URL") or default_database_url
     )
+    engine_options = {"pool_pre_ping": True, "pool_recycle": 300}
+    schema = os.getenv("APP_DB_SCHEMA", "").strip()
+    if schema:
+        if schema not in {"emp_dev", "emp_sit"}:
+            raise ValueError("APP_DB_SCHEMA must be emp_dev or emp_sit")
+        if not configured_url.startswith("postgresql"):
+            raise ValueError("APP_DB_SCHEMA requires PostgreSQL")
+        engine_options["connect_args"] = {"options": f"-csearch_path={schema}"}
+
     app.config.from_mapping(
         SQLALCHEMY_DATABASE_URI=configured_url,
         SQLALCHEMY_TRACK_MODIFICATIONS=False,
-        SQLALCHEMY_ENGINE_OPTIONS={"pool_pre_ping": True, "pool_recycle": 300},
+        SQLALCHEMY_ENGINE_OPTIONS=engine_options,
         AUTO_CREATE_TABLES=_as_bool(os.getenv("AUTO_CREATE_TABLES"), True),
         SEED_DEMO_DATA=_as_bool(
             os.getenv("SEED_DEMO_DATA"), configured_url.startswith("sqlite")
