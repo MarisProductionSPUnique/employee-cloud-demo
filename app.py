@@ -43,6 +43,7 @@ ALLOWED_STATUSES = {"Active", "On Leave", "Inactive"}
 
 class Employee(db.Model):
     __tablename__ = "employees"
+    __table_args__ = {"schema": os.getenv("APP_DB_SCHEMA")} if os.getenv("APP_DB_SCHEMA") in {"emp_dev", "emp_sit"} else {}
 
     id: Mapped[int] = mapped_column(primary_key=True)
     employee_code: Mapped[str] = mapped_column(String(20), unique=True, index=True)
@@ -222,7 +223,6 @@ def create_app(test_config: dict[str, Any] | None = None) -> Flask:
             raise ValueError("APP_DB_SCHEMA must be emp_dev or emp_sit")
         if not configured_url.startswith("postgresql"):
             raise ValueError("APP_DB_SCHEMA requires PostgreSQL")
-        engine_options["connect_args"] = {"options": f"-csearch_path={schema}"}
 
     app.config.from_mapping(
         SQLALCHEMY_DATABASE_URI=configured_url,
